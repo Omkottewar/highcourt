@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { searchCases, getDistricts, getCaseTypes, softDeleteCase, supabase } from '../lib/supabase'
+import { searchCases, getDistricts, getCaseTypes, softDeleteCase, getCaseById, supabase } from '../lib/supabase'
 import { Spinner, CaseBadge, EmptyState, Pagination, Confirm } from '../components/UI'
 import CaseForm from '../components/CaseForm'
 import CaseDetail from '../components/CaseDetail'
@@ -8,6 +8,11 @@ import { format } from 'date-fns'
 
 const PAGE_SIZE = 50
 
+function formatDate(dateStr) {
+  if (!dateStr || dateStr === '1900-01-01') return 'Unknown'
+  try { return format(new Date(dateStr), 'dd/MM/yy') } catch { return '—' }
+}
+
 export default function CasesPage() {
   const { staff }          = useAuth()
   const [cases, setCases]  = useState([])
@@ -15,21 +20,23 @@ export default function CasesPage() {
   const [page, setPage]    = useState(0)
   const [loading, setLoading] = useState(false)
 
-  const [query, setQuery]       = useState('')
-  const [district, setDistrict] = useState('')
-  const [caseType, setCaseType] = useState('')
-  const [dateFrom, setDateFrom] = useState('')
-  const [dateTo, setDateTo]     = useState('')
-  const [cyear, setCyear]       = useState('')
+  const [query, setQuery]           = useState('')
+  const [districtId, setDistrictId] = useState('')
+  const [caseTypeId, setCaseTypeId] = useState('')
+  const [dateFrom, setDateFrom]     = useState('')
+  const [dateTo, setDateTo]         = useState('')
+  const [cyear, setCyear]           = useState('')
+  const [sortField, setSortField]   = useState('dated')
+  const [sortAsc, setSortAsc]       = useState(false)
 
   const [districts, setDistricts]  = useState([])
   const [caseTypes, setCaseTypes]  = useState([])
 
-  const [showForm, setShowForm]   = useState(false)
-  const [editCase, setEditCase]   = useState(null)
-  const [detailCase, setDetailCase] = useState(null)
+  const [showForm, setShowForm]         = useState(false)
+  const [editCase, setEditCase]         = useState(null)
+  const [detailCase, setDetailCase]     = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [delReason, setDelReason] = useState('')
+  const [delReason, setDelReason]       = useState('')
 
   useEffect(() => {
     getDistricts().then(r => setDistricts(r.data || []))
@@ -38,19 +45,35 @@ export default function CasesPage() {
 
   const load = useCallback(async (pg = 0) => {
     setLoading(true)
-    const { data, count } = await searchCases({ query, district, caseType, dateFrom, dateTo, cyear, page: pg, pageSize: PAGE_SIZE })
+    const { data, count } = await searchCases({
+      query, districtId, caseTypeId, dateFrom, dateTo, cyear,
+      sortField, sortAsc, page: pg, pageSize: PAGE_SIZE
+    })
     setCases(data || [])
     setTotal(count || 0)
     setPage(pg)
     setLoading(false)
-  }, [query, district, caseType, dateFrom, dateTo, cyear])
+  }, [query, districtId, caseTypeId, dateFrom, dateTo, cyear, sortField, sortAsc])
 
-  useEffect(() => { load(0) }, [district, caseType, dateFrom, dateTo, cyear]) // eslint-disable-line
+  useEffect(() => { load(0) }, [districtId, caseTypeId, dateFrom, dateTo, cyear, sortField, sortAsc]) // eslint-disable-line
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortAsc(a => !a)
+    } else {
+      setSortAsc(field === 'petitioner')
+      setSortField(field)
+    }
+  }
+  const SortIcon = ({ field }) => {
+    if (sortField !== field) return <span className="sort-idle">⇅</span>
+    return <span className="sort-active">{sortAsc ? '▲' : '▼'}</span>
+  }
 
   const handleSearch = e => { e.preventDefault(); load(0) }
 
   const openDetail = async (c) => {
-    const { data } = await supabase.from('v_case_detail').select('*').eq('id', c.id).single()
+    const { data } = await getCaseById(c.id)
     if (data) setDetailCase(data)
   }
 
@@ -62,21 +85,23 @@ export default function CasesPage() {
 
   const handleDelete = async () => {
     if (!deleteTarget) return
-    await softDeleteCase(deleteTarget.id, delReason)
+    await softDeleteCase(deleteTarget.id, delReason, staff?.id)
     setDeleteTarget(null)
     setDelReason('')
     load(page)
   }
 
-  const canEdit = ['admin','supervisor','operator'].includes(staff?.role)
-  const canDelete = ['admin','supervisor'].includes(staff?.role)
+  const canEdit   = ['admin', 'supervisor', 'operator'].includes(staff?.role)
+  const canDelete = staff?.role === 'admin'
+
+  const regdLabel = (c) => `${c.regd_no}/${c.cyear === 1990 ? 'Unknown' : c.cyear}`
 
   return (
     <div className="fade-in">
       <div className="page-header">
         <div>
           <h1 className="page-title">Cases</h1>
-          <p className="page-subtitle">{total} records · SearchFile</p>
+          <p className="page-subtitle">{total} records</p>
         </div>
         {canEdit && (
           <button className="btn btn-gold" onClick={() => { setEditCase(null); setShowForm(true) }}>
@@ -91,11 +116,14 @@ export default function CasesPage() {
           <span className="icon">⌕</span>
           <input className="form-input search-input" value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search petitioner, respondent, advocate…" />
+            placeholder="Search petitioner or advocate…" />
         </div>
         <button className="btn btn-primary" type="submit">Search</button>
-        {(query || district || caseType || dateFrom || dateTo || cyear) && (
-          <button className="btn btn-ghost" type="button" onClick={() => { setQuery(''); setDistrict(''); setCaseType(''); setDateFrom(''); setDateTo(''); setCyear('') }}>
+        {(query || districtId || caseTypeId || dateFrom || dateTo || cyear) && (
+          <button className="btn btn-ghost" type="button" onClick={() => {
+            setQuery(''); setDistrictId(''); setCaseTypeId('')
+            setDateFrom(''); setDateTo(''); setCyear('')
+          }}>
             Clear
           </button>
         )}
@@ -104,14 +132,14 @@ export default function CasesPage() {
       {/* Filters */}
       <div className="filters-row">
         <select className="form-select" style={{ width: 'auto', minWidth: 140 }}
-          value={district} onChange={e => setDistrict(e.target.value)}>
+          value={districtId} onChange={e => setDistrictId(e.target.value)}>
           <option value="">All districts</option>
-          {districts.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+          {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
         <select className="form-select" style={{ width: 'auto', minWidth: 130 }}
-          value={caseType} onChange={e => setCaseType(e.target.value)}>
+          value={caseTypeId} onChange={e => setCaseTypeId(e.target.value)}>
           <option value="">All types</option>
-          {caseTypes.map(t => <option key={t.id} value={t.short_code}>{t.short_code} — {t.long_name}</option>)}
+          {caseTypes.map(t => <option key={t.id} value={t.id}>{t.short_code} — {t.long_name}</option>)}
         </select>
         <input className="form-input" type="number" placeholder="Year" value={cyear}
           onChange={e => setCyear(e.target.value)}
@@ -134,28 +162,28 @@ export default function CasesPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Regd. No.</th>
+                  <th className="sort-th" onClick={() => handleSort('regd_no')}>Regd. No.<SortIcon field="regd_no" /></th>
                   <th>Type</th>
-                  <th>Petitioner</th>
+                  <th className="sort-th" onClick={() => handleSort('petitioner')}>Petitioner<SortIcon field="petitioner" /></th>
                   <th>Respondent</th>
                   <th>Advocate</th>
-                  <th>Date</th>
+                  <th className="sort-th" onClick={() => handleSort('dated')}>Date<SortIcon field="dated" /></th>
                   <th>District</th>
-                  <th>Copies</th>
+                  <th className="sort-th" onClick={() => handleSort('copies')}>Copies<SortIcon field="copies" /></th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
                 {cases.map(c => (
-                  <tr key={c['REGD.NO'] + '-' + c.CYear} onClick={() => openDetail({ ...c, id: c.id })}>
-                    <td className="mono">{c['REGD.NO']}/{c.CYear}</td>
-                    <td><CaseBadge type={c.Type} /></td>
-                    <td className="truncate" style={{ maxWidth: 180 }}>{c.Petitioner}</td>
-                    <td className="truncate muted" style={{ maxWidth: 160 }}>{c.RESPONDENT}</td>
-                    <td className="truncate muted" style={{ maxWidth: 140 }}>{c.ADVOCATE}</td>
-                    <td className="mono muted">{c.DATE ? format(new Date(c.DATE), 'dd/MM/yy') : '—'}</td>
-                    <td><span className="badge badge-dist">{c.District}</span></td>
-                    <td className="mono muted">{c.CP}</td>
+                  <tr key={c.id} onClick={() => openDetail(c)}>
+                    <td className="mono">{regdLabel(c)}</td>
+                    <td><CaseBadge type={c.case_types?.short_code} /></td>
+                    <td className="truncate" style={{ maxWidth: 180 }}>{c.petitioner}</td>
+                    <td className="truncate muted" style={{ maxWidth: 160 }}>—</td>
+                    <td className="truncate muted" style={{ maxWidth: 140 }}>{c.advocates?.full_name || c.adv_name_raw || '—'}</td>
+                    <td className="mono muted">{formatDate(c.dated)}</td>
+                    <td><span className="badge badge-dist">{c.districts?.name}</span></td>
+                    <td className="mono muted">{c.copies}</td>
                     <td onClick={e => e.stopPropagation()}>
                       <div style={{ display: 'flex', gap: 4 }}>
                         {canEdit && (
@@ -192,7 +220,7 @@ export default function CasesPage() {
         danger
         message={
           <div>
-            <p>Are you sure you want to delete case <strong>{deleteTarget?.['REGD.NO']}/{deleteTarget?.CYear}</strong>? This action will soft-delete the record — it can be recovered by an admin.</p>
+            <p>Are you sure you want to delete case <strong>{deleteTarget?.regd_no}/{deleteTarget?.cyear}</strong>? This action will soft-delete the record — it can be recovered by an admin.</p>
             <div style={{ marginTop: 12 }}>
               <label className="form-label">Reason for deletion</label>
               <textarea className="form-textarea" value={delReason} onChange={e => setDelReason(e.target.value)} placeholder="Enter reason…" style={{ minHeight: 60 }} />

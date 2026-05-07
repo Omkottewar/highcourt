@@ -69,16 +69,16 @@ export default function CaseDetail({ open, onClose, caseData, userRole }) {
 
   return (
     <Modal open={open} onClose={onClose} size="820px"
-      title={`Case ${caseData.regd_no}/${caseData.cyear}`}
+      title={`Case ${caseData.regd_no}/${caseData.cyear === 1990 ? 'Unknown' : caseData.cyear}`}
       footer={<button className="btn btn-ghost" onClick={onClose}>Close</button>}>
 
       {/* Case header strip */}
       <div style={{ background: 'var(--navy)', borderRadius: 8, padding: '14px 18px', marginBottom: 20, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-        <CaseBadge type={caseData.case_type} />
+        <CaseBadge type={caseData.case_types?.short_code} />
         {caseData.wp_number && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--gold-light)' }}>{caseData.wp_number}</span>}
-        <span className="badge badge-dist">{caseData.district}</span>
+        <span className="badge badge-dist">{caseData.districts?.name}</span>
         <span style={{ fontSize: 13, color: '#8896a5', marginLeft: 'auto' }}>
-          Filed: {caseData.dated ? format(new Date(caseData.dated), 'dd MMM yyyy') : '—'}
+          Filed: {(!caseData.dated || caseData.dated === '1900-01-01') ? 'Date Unknown' : format(new Date(caseData.dated), 'dd MMM yyyy')}
         </span>
       </div>
 
@@ -102,19 +102,21 @@ export default function CaseDetail({ open, onClose, caseData, userRole }) {
               <div className="detail-panel">
                 <div className="detail-field">
                   <div className="detail-field-label">Registration No.</div>
-                  <div className="detail-field-value mono">{caseData.regd_no}/{caseData.cyear}</div>
+                  <div className="detail-field-value mono">{caseData.regd_no}/{caseData.cyear === 1990 ? 'Unknown' : caseData.cyear}</div>
                 </div>
                 <div className="detail-field">
                   <div className="detail-field-label">Case type</div>
-                  <div className="detail-field-value"><CaseBadge type={caseData.case_type} /></div>
+                  <div className="detail-field-value"><CaseBadge type={caseData.case_types?.short_code} /></div>
                 </div>
                 <div className="detail-field">
                   <div className="detail-field-label">District</div>
-                  <div className="detail-field-value">{caseData.district}{caseData.division ? ` · ${caseData.division} Division` : ''}</div>
+                  <div className="detail-field-value">{caseData.districts?.name}{caseData.districts?.division ? ` · ${caseData.districts.division} Division` : ''}</div>
                 </div>
                 <div className="detail-field">
                   <div className="detail-field-label">Date filed</div>
-                  <div className="detail-field-value">{caseData.dated ? format(new Date(caseData.dated), 'dd MMMM yyyy') : '—'}</div>
+                  <div className="detail-field-value">
+                    {(!caseData.dated || caseData.dated === '1900-01-01') ? 'Date Unknown' : format(new Date(caseData.dated), 'dd MMMM yyyy')}
+                  </div>
                 </div>
                 <div className="detail-field">
                   <div className="detail-field-label">Copies</div>
@@ -130,16 +132,16 @@ export default function CaseDetail({ open, onClose, caseData, userRole }) {
               <div className="detail-panel">
                 <div className="detail-field">
                   <div className="detail-field-label">Name</div>
-                  <div className="detail-field-value">{caseData.advocate_name || '—'}</div>
+                  <div className="detail-field-value">{caseData.advocates?.full_name || caseData.adv_name_raw || '—'}</div>
                 </div>
                 <div className="detail-field">
                   <div className="detail-field-label">Mobile</div>
-                  <div className="detail-field-value mono">{caseData.advocate_mobile || '—'}</div>
+                  <div className="detail-field-value mono">{caseData.advocates?.mobile_no || '—'}</div>
                 </div>
-                {caseData.advocate_address && (
+                {caseData.advocates?.address && (
                   <div className="detail-field" style={{ gridColumn: '1 / -1' }}>
                     <div className="detail-field-label">Address</div>
-                    <div className="detail-field-value">{caseData.advocate_address}</div>
+                    <div className="detail-field-value">{caseData.advocates.address}</div>
                   </div>
                 )}
               </div>

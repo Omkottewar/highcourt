@@ -7,29 +7,46 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // ── Cases ──────────────────────────────────────────────────────────────────
 
-export async function searchCases({ query, district, caseType, dateFrom, dateTo, cyear, page = 0, pageSize = 50 }) {
+export async function searchCases({ query, districtId, caseTypeId, dateFrom, dateTo, cyear, sortField = 'dated', sortAsc = false, page = 0, pageSize = 50 }) {
   let q = supabase
-    .from('SearchFile')
-    .select('*', { count: 'exact' })
+    .from('cases')
+    .select(`
+      id, regd_no, cyear, petitioner, dated, copies, adv_name_raw, wp_number,
+      case_types(id, short_code, long_name),
+      districts(id, name, division),
+      advocates(id, full_name)
+    `, { count: 'exact' })
+    .eq('is_deleted', false)
 
   if (query) {
     const safe = query.replace(/[%_]/g, '\\$&')
-    q = q.or(`Petitioner.ilike.%${safe}%,RESPONDENT.ilike.%${safe}%,ADVOCATE.ilike.%${safe}%`)
+    q = q.or(`petitioner.ilike.%${safe}%,adv_name_raw.ilike.%${safe}%`)
   }
-  if (district) q = q.eq('District', district)
-  if (caseType) q = q.eq('Type', caseType)
-  if (dateFrom) q = q.gte('DATE', dateFrom)
-  if (dateTo)   q = q.lte('DATE', dateTo)
-  if (cyear)    q = q.eq('CYear', cyear)
+  if (districtId) q = q.eq('district_id', parseInt(districtId))
+  if (caseTypeId)  q = q.eq('case_type_id', parseInt(caseTypeId))
+  if (dateFrom)   q = q.gte('dated', dateFrom)
+  if (dateTo)     q = q.lte('dated', dateTo)
+  if (cyear)      q = q.eq('cyear', parseInt(cyear))
 
-  q = q.order('DATE', { ascending: false })
+  const ALLOWED_SORT = ['dated', 'regd_no', 'cyear', 'petitioner', 'copies']
+  const field = ALLOWED_SORT.includes(sortField) ? sortField : 'dated'
+  q = q.order(field, { ascending: sortAsc })
        .range(page * pageSize, (page + 1) * pageSize - 1)
 
   return q
 }
 
 export async function getCaseById(id) {
-  return supabase.from('v_case_detail').select('*').eq('id', id).single()
+  return supabase
+    .from('cases')
+    .select(`
+      *,
+      case_types(id, short_code, long_name),
+      districts(id, name, division),
+      advocates(id, full_name, short_name, mobile_no, address, email, bar_no)
+    `)
+    .eq('id', id)
+    .single()
 }
 
 export async function getCaseRespondents(caseId) {
@@ -64,8 +81,13 @@ export async function updateCase(id, data) {
   return supabase.from('cases').update(data).eq('id', id).select().single()
 }
 
-export async function softDeleteCase(id, reason) {
-  return supabase.from('cases').update({ is_deleted: true, deletion_reason: reason }).eq('id', id)
+export async function softDeleteCase(id, reason, userId) {
+  return supabase.from('cases').update({
+    is_deleted: true,
+    deletion_reason: reason,
+    deleted_at: new Date().toISOString(),
+    deleted_by: userId || null,
+  }).eq('id', id)
 }
 
 export async function addRemark(caseId, note) {
@@ -99,7 +121,19 @@ export async function getDepartments(query) {
 }
 
 export async function getUpcomingHearings() {
-  return supabase.from('v_upcoming_hearings').select('*').limit(20)
+  const today = new Date().toISOString().split('T')[0]
+  return supabase
+    .from('case_hearings')
+    .select(`
+      id, hearing_date, court_no, next_date, notes, outcome,
+      cases(id, regd_no, cyear, petitioner, wp_number,
+        case_types(short_code),
+        districts(name)
+      )
+    `)
+    .gte('hearing_date', today)
+    .order('hearing_date', { ascending: true })
+    .limit(20)
 }
 
 // ── Dashboard stats ────────────────────────────────────────────────────────

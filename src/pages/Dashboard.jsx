@@ -79,13 +79,13 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {hearings.map(h => (
-                  <tr key={h.hearing_id}>
+                  <tr key={h.id}>
                     <td className="mono">{h.hearing_date ? format(new Date(h.hearing_date), 'dd/MM/yyyy') : '—'}</td>
-                    <td className="mono">{h.regd_no}/{h.cyear}</td>
-                    <td><CaseBadge type={h.case_type} /></td>
-                    <td className="truncate">{h.petitioner}</td>
-                    <td><span className="badge badge-dist">{h.district}</span></td>
-                    <td className="mono muted">{h.wp_number || '—'}</td>
+                    <td className="mono">{h.cases?.regd_no}/{h.cases?.cyear === 1990 ? 'Unknown' : h.cases?.cyear}</td>
+                    <td><CaseBadge type={h.cases?.case_types?.short_code} /></td>
+                    <td className="truncate">{h.cases?.petitioner}</td>
+                    <td><span className="badge badge-dist">{h.cases?.districts?.name}</span></td>
+                    <td className="mono muted">{h.cases?.wp_number || '—'}</td>
                     <td className="mono">{h.next_date ? format(new Date(h.next_date), 'dd/MM/yyyy') : '—'}</td>
                   </tr>
                 ))}
