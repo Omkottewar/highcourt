@@ -87,6 +87,50 @@ export function Autocomplete({ value, onChange, onSelect, fetchOptions, placehol
   )
 }
 
+// ── Searchable filter dropdown ─────────────────────────────────────────────
+export function FilterSelect({ value, onChange, options = [], placeholder = 'All', minWidth = 140 }) {
+  const [open, setOpen] = useState(false)
+  const [q, setQ] = useState('')
+  const wrapRef = useRef()
+
+  useEffect(() => {
+    const handler = e => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const filtered = q
+    ? options.filter(o => o.toLowerCase().includes(q.toLowerCase()))
+    : options
+
+  const select = (val) => { onChange(val); setOpen(false); setQ('') }
+
+  return (
+    <div className="filter-select" ref={wrapRef} style={{ minWidth }}>
+      <button type="button" className="form-select filter-select-btn"
+        onClick={() => setOpen(o => !o)}>
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{value || placeholder}</span>
+        <span className="filter-select-caret">▾</span>
+      </button>
+      {open && (
+        <div className="filter-select-panel">
+          <input className="form-input filter-select-search" autoFocus
+            value={q} onChange={e => setQ(e.target.value)} placeholder="Type to filter…" />
+          <div className="filter-select-list">
+            <div className={`filter-select-item ${!value ? 'active' : ''}`}
+              onClick={() => select('')}>{placeholder}</div>
+            {filtered.map(o => (
+              <div key={o} className={`filter-select-item ${o === value ? 'active' : ''}`}
+                onClick={() => select(o)}>{o}</div>
+            ))}
+            {filtered.length === 0 && <div className="filter-select-empty">No matches</div>}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Case type badge ────────────────────────────────────────────────────────
 export function CaseBadge({ type }) {
   const map = { WP: 'badge-wp', CP: 'badge-cp', PIL: 'badge-pil' }

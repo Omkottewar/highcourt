@@ -1,56 +1,55 @@
 import { useState, useEffect } from 'react'
-import { Modal, Autocomplete, Alert, Spinner } from '../components/UI'
-import {
-  getAdvocates, getDepartments,
-  createCase, updateCase, getNextRegdNo
-} from '../lib/supabase'
-import { supabase } from '../lib/supabase'
+import { Modal, Autocomplete, Alert, Spinner, FilterSelect } from './UI'
+import { getAdvocates, createCase, updateCase, getNextRegdNo, getCaseTypeOptions, getDistrictOptions } from '../lib/supabase'
+import { splitRespondents } from '../utils/respondents'
 
 const EMPTY = {
-  regd_no: '', cyear: new Date().getFullYear(), petitioner: '',
-  case_type_id: '', district_id: '', dated: '', copies: 1,
-  wp_number: '', adv_name_raw: '', advocate_id: null,
+  RegdNo: '', CYear: String(new Date().getFullYear()), Petitioner: '',
+  Type: '', District: '', Dated: '', Copies: '1', RespndentNo: '',
+  Adv: '', AdvMoNo: '', AdvAddress: '', Remark: '', LongType: '',
 }
 
-export default function CaseForm({ open, onClose, onSaved, editCase, districts = [], caseTypes = [] }) {
+const isWritPetition = (typeLabel) => /writ\s*petition/i.test(typeLabel || '')
+// Fixed suffix "/20" — the clerk writes the remaining year digits by hand.
+const WP_LONG_TYPE = 'WP NO. ______________/20'
+
+export default function CaseForm({ open, onClose, onSaved, editCase }) {
   const [form, setForm]           = useState(EMPTY)
-  const [respondents, setRespondents] = useState([{ resp_no: 1, resp_name_raw: '', dept_id: null }])
+  const [respondents, setRespondents] = useState([''])
+  const [caseTypeOptions, setCaseTypeOptions] = useState([])
+  const [districtOptions, setDistrictOptions] = useState([])
   const [saving, setSaving]       = useState(false)
   const [error, setError]         = useState('')
   const [advInput, setAdvInput]   = useState('')
   const [regdNoLoading, setRegdNoLoading] = useState(false)
 
   useEffect(() => {
+    getCaseTypeOptions().then(({ data }) => setCaseTypeOptions(data || []))
+    getDistrictOptions().then(({ data }) => setDistrictOptions(data || []))
+  }, [])
+
+  useEffect(() => {
     if (!open) return
     if (editCase) {
-      const advName = editCase.adv_name_raw || editCase.advocate_name || ''
       setForm({
-        regd_no: editCase.regd_no || '', cyear: editCase.cyear || new Date().getFullYear(),
-        petitioner: editCase.petitioner || '', case_type_id: editCase.case_type_id || '',
-        district_id: editCase.district_id || '', dated: editCase.dated || '',
-        copies: editCase.copies || 1, wp_number: editCase.wp_number || '',
-        adv_name_raw: advName, advocate_id: editCase.advocate_id || null,
+        RegdNo: editCase.RegdNo ?? '', CYear: editCase.CYear ?? '',
+        Petitioner: editCase.Petitioner || '', Type: editCase.Type || '',
+        District: editCase.District || '', Dated: editCase.Dated || '',
+        Copies: editCase.Copies || '', RespndentNo: editCase.RespndentNo || '',
+        Adv: editCase.Adv || '', AdvMoNo: editCase.AdvMoNo || '',
+        AdvAddress: editCase.AdvAddress || '', Remark: editCase.Remark || '',
+        LongType: editCase.LongType || '',
       })
-      setAdvInput(advName)
-      // Load respondents for this case
-      supabase.from('case_respondents')
-        .select('*, departments(full_name)')
-        .eq('case_id', editCase.id)
-        .order('resp_no')
-        .then(({ data }) => {
-          if (data?.length) setRespondents(data.map(r => ({
-            resp_no: r.resp_no,
-            resp_name_raw: r.departments?.full_name || r.resp_name_raw || '',
-            dept_id: r.dept_id,
-          })))
-        })
+      setAdvInput(editCase.Adv || '')
+      const list = splitRespondents(editCase.Respondets)
+      setRespondents(list.length ? list : [''])
     } else {
       setForm(EMPTY)
       setAdvInput('')
-      setRespondents([{ resp_no: 1, resp_name_raw: '', dept_id: null }])
+      setRespondents([''])
       setRegdNoLoading(true)
-      getNextRegdNo(EMPTY.cyear).then(n => {
-        setForm(f => ({ ...f, regd_no: n }))
+      getNextRegdNo().then(n => {
+        setForm(f => ({ ...f, RegdNo: String(n) }))
         setRegdNoLoading(false)
       })
     }
@@ -59,22 +58,16 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  const addRespondent = () =>
-    setRespondents(r => [...r, { resp_no: r.length + 1, resp_name_raw: '', dept_id: null }])
-
-  const setResp = (i, field, val) =>
-    setRespondents(r => r.map((x, idx) => idx === i ? { ...x, [field]: val } : x))
-
-  const removeResp = i =>
-    setRespondents(r => r.filter((_, idx) => idx !== i).map((x, idx) => ({ ...x, resp_no: idx + 1 })))
+  const addRespondent = () => setRespondents(r => [...r, ''])
+  const setResp = (i, val) => setRespondents(r => r.map((x, idx) => idx === i ? val : x))
+  const removeResp = i => setRespondents(r => r.filter((_, idx) => idx !== i))
 
   const validate = () => {
-    if (!form.regd_no) return 'Registration number is required'
-    if (!form.petitioner.trim()) return 'Petitioner name is required'
-    if (!form.case_type_id) return 'Case type is required'
-    if (!form.district_id)  return 'District is required'
-    if (!form.dated)         return 'Date is required'
-    if (respondents.some(r => !r.resp_name_raw.trim())) return 'All respondent fields must be filled'
+    if (!String(form.RegdNo).trim()) return 'Registration number is required'
+    if (!form.Petitioner.trim())     return 'Petitioner name is required'
+    if (!form.Type.trim())           return 'Case type is required'
+    if (!form.District.trim())       return 'District is required'
+    if (!form.Dated)                 return 'Date is required'
     return null
   }
 
@@ -84,40 +77,29 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
     setError('')
     setSaving(true)
 
-    const caseData = {
-      regd_no: parseInt(form.regd_no),
-      cyear: parseInt(form.cyear),
-      petitioner: form.petitioner.trim().toUpperCase(),
-      case_type_id: parseInt(form.case_type_id),
-      district_id: parseInt(form.district_id),
-      dated: form.dated,
-      copies: parseInt(form.copies) || 1,
-      wp_number: form.wp_number.trim() || null,
-      adv_name_raw: form.adv_name_raw.trim().toUpperCase() || null,
-      advocate_id: form.advocate_id || null,
+    const cleanResp = respondents.map(r => r.trim()).filter(Boolean)
+    const payload = {
+      RegdNo: parseInt(form.RegdNo, 10),
+      CYear: String(form.CYear).trim() || null,
+      Petitioner: form.Petitioner.trim().toUpperCase(),
+      Respondets: cleanResp.length ? cleanResp.map(r => r.toUpperCase()).join('.,') : null,
+      Type: form.Type.trim() || null,
+      District: form.District.trim() || null,
+      Dated: form.Dated || null,
+      Copies: String(form.Copies).trim() || null,
+      RespndentNo: form.RespndentNo.trim() || null,
+      Adv: form.Adv.trim().toUpperCase() || null,
+      AdvMoNo: form.AdvMoNo.trim() || null,
+      AdvAddress: form.AdvAddress.trim().toUpperCase() || null,
+      Remark: form.Remark.trim() || null,
+      LongType: form.LongType.trim() || null,
     }
 
-    let caseId
-    if (editCase) {
-      const { data, error: e } = await updateCase(editCase.id, caseData)
-      if (e) { setError(e.message); setSaving(false); return }
-      caseId = editCase.id
-    } else {
-      const { data, error: e } = await createCase(caseData)
-      if (e) { setError(e.message); setSaving(false); return }
-      caseId = data.id
-    }
+    const { error: e } = editCase
+      ? await updateCase({ RegdNo: editCase.RegdNo, CYear: editCase.CYear }, payload)
+      : await createCase(payload)
 
-    // Upsert respondents — delete old then insert new
-    await supabase.from('case_respondents').delete().eq('case_id', caseId)
-    const respRows = respondents.map(r => ({
-      case_id: caseId,
-      resp_no: r.resp_no,
-      resp_name_raw: r.resp_name_raw.trim().toUpperCase(),
-      dept_id: r.dept_id || null,
-    }))
-    const { error: re } = await supabase.from('case_respondents').insert(respRows)
-    if (re) { setError(re.message); setSaving(false); return }
+    if (e) { setError(e.message); setSaving(false); return }
 
     setSaving(false)
     onSaved?.()
@@ -126,7 +108,7 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
 
   return (
     <Modal open={open} onClose={onClose} size="800px"
-      title={editCase ? `Edit Case — ${editCase.regd_no}/${editCase.cyear}` : 'New Case Entry'}
+      title={editCase ? `Edit Case — ${editCase.RegdNo}` : 'New Case Entry'}
       footer={<>
         <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
         <button className="btn btn-gold" onClick={handleSave} disabled={saving}>
@@ -140,9 +122,9 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
         <div className="form-group">
           <label className="form-label">Regd. No.<span className="req">*</span></label>
           <div style={{ position: 'relative' }}>
-            <input className="form-input" type="number" value={regdNoLoading ? '' : form.regd_no}
+            <input className="form-input" type="number" value={regdNoLoading ? '' : form.RegdNo}
               readOnly={!editCase}
-              onChange={editCase ? e => set('regd_no', e.target.value) : undefined}
+              onChange={editCase ? e => set('RegdNo', e.target.value) : undefined}
               placeholder={regdNoLoading ? 'Generating…' : ''}
               style={!editCase ? { background: 'var(--bg-alt, #f5f5f5)', cursor: 'default' } : {}} />
             {!editCase && !regdNoLoading && (
@@ -152,50 +134,48 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
           </div>
         </div>
         <div className="form-group">
-          <label className="form-label">Year<span className="req">*</span></label>
-          <input className="form-input" type="number" value={form.cyear}
-            onChange={e => {
-              const yr = e.target.value
-              set('cyear', yr)
-              if (!editCase && yr.length === 4) {
-                setRegdNoLoading(true)
-                getNextRegdNo(parseInt(yr)).then(n => {
-                  setForm(f => ({ ...f, regd_no: n }))
-                  setRegdNoLoading(false)
-                })
-              }
-            }} min="1990" max="2099" />
+          <label className="form-label">Year</label>
+          <input className="form-input" type="number" value={form.CYear}
+            onChange={e => set('CYear', e.target.value)} min="1900" max="2099" />
         </div>
         <div className="form-group">
           <label className="form-label">Date filed<span className="req">*</span></label>
-          <input className="form-input" type="date" value={form.dated}
-            onChange={e => set('dated', e.target.value)} />
+          <input className="form-input" type="date" value={form.Dated}
+            onChange={e => set('Dated', e.target.value)} />
         </div>
       </div>
 
       <div className="form-row form-row-2">
         <div className="form-group">
           <label className="form-label">Case type<span className="req">*</span></label>
-          <select className="form-select" value={form.case_type_id}
-            onChange={e => set('case_type_id', e.target.value)}>
-            <option value="">Select type…</option>
-            {caseTypes.map(t => <option key={t.id} value={t.id}>{t.short_code} — {t.long_name}</option>)}
-          </select>
+          <FilterSelect
+            value={form.Type}
+            placeholder="Select case type…"
+            options={caseTypeOptions.map(t => t.long_type || t.short_type).filter(Boolean)}
+            onChange={val => setForm(f => ({
+              ...f,
+              Type: val,
+              LongType: isWritPetition(val) ? WP_LONG_TYPE : f.LongType,
+            }))}
+          />
         </div>
         <div className="form-group">
           <label className="form-label">District<span className="req">*</span></label>
-          <select className="form-select" value={form.district_id}
-            onChange={e => set('district_id', e.target.value)}>
+          <select className="form-select" value={form.District}
+            onChange={e => set('District', e.target.value)}>
             <option value="">Select district…</option>
-            {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            {districtOptions.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+            {form.District && !districtOptions.some(d => d.name === form.District) && (
+              <option value={form.District}>{form.District}</option>
+            )}
           </select>
         </div>
       </div>
 
       <div className="form-group">
         <label className="form-label">Petitioner<span className="req">*</span></label>
-        <input className="form-input" value={form.petitioner}
-          onChange={e => set('petitioner', e.target.value)}
+        <input className="form-input" value={form.Petitioner}
+          onChange={e => set('Petitioner', e.target.value)}
           placeholder="SHRI RITESH SHIVRAJ VAIRAGADE" />
       </div>
 
@@ -204,32 +184,54 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
           <label className="form-label">Advocate</label>
           <Autocomplete
             value={advInput}
-            onChange={v => { setAdvInput(v); set('adv_name_raw', v); set('advocate_id', null) }}
-            onSelect={opt => { setAdvInput(opt.full_name); set('adv_name_raw', opt.full_name); set('advocate_id', opt.id) }}
+            onChange={v => { setAdvInput(v); set('Adv', v) }}
+            onSelect={opt => {
+              setAdvInput(opt.name)
+              set('Adv', opt.name)
+              if (opt.mo_no) set('AdvMoNo', opt.mo_no)
+              if (opt.address) set('AdvAddress', opt.address)
+            }}
             fetchOptions={async q => { const { data } = await getAdvocates(q); return data || [] }}
             placeholder="Search advocate…"
-            labelKey="full_name"
+            labelKey="name"
           />
-          <span className="form-hint">Type to search existing advocates, or enter name directly</span>
+          <span className="form-hint">Type to search the advocate master, or enter a name directly</span>
         </div>
         <div className="form-group">
-          <label className="form-label">WP / Case number</label>
-          <input className="form-input" value={form.wp_number}
-            onChange={e => set('wp_number', e.target.value)}
-            placeholder="WP/458/2026" />
+          <label className="form-label">Advocate mobile</label>
+          <input className="form-input" value={form.AdvMoNo}
+            onChange={e => set('AdvMoNo', e.target.value)} placeholder="9405146880" />
         </div>
       </div>
 
       <div className="form-group">
-        <label className="form-label">No. of copies</label>
-        <input className="form-input" type="number" value={form.copies} min="1" max="20"
-          onChange={e => set('copies', e.target.value)} style={{ maxWidth: 100 }} />
+        <label className="form-label">Advocate address</label>
+        <input className="form-input" value={form.AdvAddress}
+          onChange={e => set('AdvAddress', e.target.value)} />
+      </div>
+
+      <div className="form-row form-row-3">
+        <div className="form-group">
+          <label className="form-label">No. of copies</label>
+          <input className="form-input" type="number" value={form.Copies} min="0" max="99"
+            onChange={e => set('Copies', e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Copy received for Resp. No.</label>
+          <input className="form-input" value={form.RespndentNo}
+            onChange={e => set('RespndentNo', e.target.value)} placeholder="1 , 2" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">Long type</label>
+          <input className="form-input" value={form.LongType}
+            onChange={e => set('LongType', e.target.value)} placeholder="WP NO. ______________/20" />
+        </div>
       </div>
 
       {/* Respondents */}
       <div style={{ marginTop: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <label className="form-label" style={{ margin: 0 }}>Respondents<span className="req">*</span></label>
+          <label className="form-label" style={{ margin: 0 }}>Respondents</label>
           <button className="btn btn-ghost btn-sm" type="button" onClick={addRespondent}>+ Add respondent</button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -241,14 +243,9 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
                 justifyContent: 'center', fontSize: 12, fontWeight: 500, flexShrink: 0, marginTop: 7
               }}>{i + 1}</div>
               <div style={{ flex: 1 }}>
-                <Autocomplete
-                  value={r.resp_name_raw}
-                  onChange={v => setResp(i, 'resp_name_raw', v)}
-                  onSelect={opt => { setResp(i, 'resp_name_raw', opt.full_name); setResp(i, 'dept_id', opt.id) }}
-                  fetchOptions={async q => { const { data } = await getDepartments(q); return data || [] }}
-                  placeholder={`Respondent ${i + 1} name…`}
-                  labelKey="full_name"
-                />
+                <input className="form-input" value={r}
+                  onChange={e => setResp(i, e.target.value)}
+                  placeholder={`Respondent ${i + 1} name…`} />
               </div>
               {respondents.length > 1 && (
                 <button className="btn btn-ghost btn-icon btn-sm" type="button"
@@ -257,6 +254,13 @@ export default function CaseForm({ open, onClose, onSaved, editCase, districts =
             </div>
           ))}
         </div>
+        <span className="form-hint">Each respondent is stored together, separated by ".,"</span>
+      </div>
+
+      <div className="form-group" style={{ marginTop: 16 }}>
+        <label className="form-label">Remark</label>
+        <textarea className="form-textarea" value={form.Remark}
+          onChange={e => set('Remark', e.target.value)} style={{ minHeight: 60 }} />
       </div>
     </Modal>
   )

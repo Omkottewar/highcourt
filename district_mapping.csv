@@ -1,0 +1,187 @@
+raw_value,canonical_name,division,is_out_of_state
+NAGPUR,NAGPUR,Vidarbha,false
+NAGPUR.,NAGPUR,Vidarbha,false
+NAGPPUR,NAGPUR,Vidarbha,false
+NAGPPPUR,NAGPUR,Vidarbha,false
+ NAGPUR,NAGPUR,Vidarbha,false
+NAGPUR ,NAGPUR,Vidarbha,false
+AMRAVATI,AMRAVATI,Vidarbha,false
+AMRAVATI.,AMRAVATI,Vidarbha,false
+AMRAVATI. ,AMRAVATI,Vidarbha,false
+AMRAVATI. 1,AMRAVATI,Vidarbha,false
+AMRAVTI,AMRAVATI,Vidarbha,false
+AM,AMRAVATI,Vidarbha,false
+ AMRAVATI,AMRAVATI,Vidarbha,false
+YAVATMAL,YAVATMAL,Vidarbha,false
+YAVAT,YAVATMAL,Vidarbha,false
+YAVA,YAVATMAL,Vidarbha,false
+YAVAMAL,YAVATMAL,Vidarbha,false
+ YAVATMAL,YAVATMAL,Vidarbha,false
+WARDHA,WARDHA,Vidarbha,false
+WARDHA.,WARDHA,Vidarbha,false
+Wardha.,WARDHA,Vidarbha,false
+WAR,WARDHA,Vidarbha,false
+W,WARDHA,Vidarbha,false
+WASHIM,WASHIM,Vidarbha,false
+BULDHANA,BULDHANA,Vidarbha,false
+BULDHANA.,BULDHANA,Vidarbha,false
+BULDHAN,BULDHANA,Vidarbha,false
+BULDANA,BULDHANA,Vidarbha,false
+BULDHANA ,BULDHANA,Vidarbha,false
+ BULDHANA,BULDHANA,Vidarbha,false
+CHANDRAPUR,CHANDRAPUR,Vidarbha,false
+CHANDRAPUR.,CHANDRAPUR,Vidarbha,false
+CHANDRAPUR. 4,CHANDRAPUR,Vidarbha,false
+CHANDRAPUR 3,CHANDRAPUR,Vidarbha,false
+CHANDRAPUR              3,CHANDRAPUR,Vidarbha,false
+CHANDRAPR,CHANDRAPUR,Vidarbha,false
+CHANDRAPPUR,CHANDRAPUR,Vidarbha,false
+ CHANDRAPUR,CHANDRAPUR,Vidarbha,false
+GADCHIROLI,GADCHIROLI,Vidarbha,false
+GADCHIROLI.,GADCHIROLI,Vidarbha,false
+GARHCHIROLI,GADCHIROLI,Vidarbha,false
+GADCHAOLI,GADCHIROLI,Vidarbha,false
+GADCHIOLI,GADCHIROLI,Vidarbha,false
+ GADCHIROLI,GADCHIROLI,Vidarbha,false
+BHANDARA,BHANDARA,Vidarbha,false
+BHANDARA.,BHANDARA,Vidarbha,false
+BHANDAR,BHANDARA,Vidarbha,false
+ BHANDARA,BHANDARA,Vidarbha,false
+GONDIA,GONDIA,Vidarbha,false
+GONDIYA,GONDIA,Vidarbha,false
+GONDI,GONDIA,Vidarbha,false
+GONDIA ,GONDIA,Vidarbha,false
+GONDA,GONDIA,Vidarbha,false
+AKOLA,AKOLA,Vidarbha,false
+AKOLA.,AKOLA,Vidarbha,false
+AKLOLA,AKOLA,Vidarbha,false
+ AKOLA,AKOLA,Vidarbha,false
+HINGOLI,HINGOLI,Marathwada,false
+NANDED,NANDED,Marathwada,false
+PARBHANI,PARBHANI,Marathwada,false
+LATUR,LATUR,Marathwada,false
+OSMANABAD,OSMANABAD,Marathwada,false
+USMANABAD,OSMANABAD,Marathwada,false
+BEED,BEED,Marathwada,false
+JALNA,JALNA,Marathwada,false
+AURANGABAD,AURANGABAD,Marathwada,false
+AURANGABAD,,AURANGABAD,Marathwada,false
+AURANGABAD.,AURANGABAD,Marathwada,false
+AURAMGABAD,AURANGABAD,Marathwada,false
+SAMBHAJI NAGAR,CHHATRAPATI SAMBHAJINAGAR,Marathwada,false
+CHH. SAMBHAJINAGAR,CHHATRAPATI SAMBHAJINAGAR,Marathwada,false
+CHHTRAPATISAMBHAJINAGAR,CHHATRAPATI SAMBHAJINAGAR,Marathwada,false
+CHHATRAPATI SAMBHAJINAGAR,CHHATRAPATI SAMBHAJINAGAR,Marathwada,false
+NASHIK,NASHIK,North Maharashtra,false
+NASIK,NASHIK,North Maharashtra,false
+NASHIK ,NASHIK,North Maharashtra,false
+DHULE,DHULE,North Maharashtra,false
+JALGAON,JALGAON,North Maharashtra,false
+JALGAON ,JALGAON,North Maharashtra,false
+JALGOAN,JALGAON,North Maharashtra,false
+JALGAON (KH),JALGAON,North Maharashtra,false
+JALGAON KHANDESH,JALGAON,North Maharashtra,false
+NANDURBAR,NANDURBAR,North Maharashtra,false
+AHMEDNAGAR,AHMEDNAGAR,Western Maharashtra,false
+AHMAEDNAGAR,AHMEDNAGAR,Western Maharashtra,false
+AHMEDNNAGAR,AHMEDNAGAR,Western Maharashtra,false
+AHMADNAGAR,AHMEDNAGAR,Western Maharashtra,false
+AHAMEDNNAGAR,AHMEDNAGAR,Western Maharashtra,false
+PUNE,PUNE,Western Maharashtra,false
+PUNE.,PUNE,Western Maharashtra,false
+PUNE ,PUNE,Western Maharashtra,false
+SATARA,SATARA,Western Maharashtra,false
+SANGLI,SANGLI,Western Maharashtra,false
+SANGLI.,SANGLI,Western Maharashtra,false
+SANGALI,SANGLI,Western Maharashtra,false
+SANGLE,SANGLI,Western Maharashtra,false
+KOLHAPUR,KOLHAPUR,Western Maharashtra,false
+SOLAPUR,SOLAPUR,Western Maharashtra,false
+MUMBAI,MUMBAI,Konkan,false
+MUMBAI.,MUMBAI,Konkan,false
+BOMBAY,MUMBAI,Konkan,false
+NAVI MUMBAI,NAVI MUMBAI,Konkan,false
+NAVI MUMBAI.,NAVI MUMBAI,Konkan,false
+NEW MUMBAI,NAVI MUMBAI,Konkan,false
+THANE,THANE,Konkan,false
+THANE.,THANE,Konkan,false
+THANE5,THANE,Konkan,false
+THENE,THANE,Konkan,false
+THANJE,THANE,Konkan,false
+ THANE,THANE,Konkan,false
+PALGHAR,PALGHAR,Konkan,false
+RAIGAD,RAIGAD,Konkan,false
+RAGAD,RAIGAD,Konkan,false
+RAIGHAD,RAIGAD,Konkan,false
+RAIGHARD,RAIGAD,Konkan,false
+RATNAGIRI,RATNAGIRI,Konkan,false
+SINDHUDURG,SINDHUDURG,Konkan,false
+BETUL,BETUL,Out-of-state,true
+BETUL (MP),BETUL,Out-of-state,true
+BETUL (M.P.),BETUL,Out-of-state,true
+BETUL (MADHYAPRADESH),BETUL,Out-of-state,true
+BHOPAL,BHOPAL,Out-of-state,true
+BHOPAL (M.P.),BHOPAL,Out-of-state,true
+BHOPAL-MP,BHOPAL,Out-of-state,true
+DELHI,DELHI,Out-of-state,true
+NEW DELHI,DELHI,Out-of-state,true
+DELHI (STATE),DELHI,Out-of-state,true
+ NEW DELHI,DELHI,Out-of-state,true
+EAST DELHI,DELHI,Out-of-state,true
+HYDERABAD,HYDERABAD,Out-of-state,true
+HYDRAABAD,HYDERABAD,Out-of-state,true
+HYDERABAD (TELANGANA),HYDERABAD,Out-of-state,true
+HYDERABAD TELANGANA,HYDERABAD,Out-of-state,true
+RAIPUR,RAIPUR,Out-of-state,true
+RAIPUR (CHATTISGARH),RAIPUR,Out-of-state,true
+RAIPUR (CHHATISGARH),RAIPUR,Out-of-state,true
+RAIPUR (C.G),RAIPUR,Out-of-state,true
+RAIPUR CHHATISGAD,RAIPUR,Out-of-state,true
+BILASPUR (CHATTISGARH),BILASPUR,Out-of-state,true
+BILASPUR CHHATISGARD,BILASPUR,Out-of-state,true
+BILASPUR,BILASPUR,Out-of-state,true
+NAGPUR (REVIEWED AS OUT-OF-STATE ENTRY),NAGPUR,Vidarbha,false
+BALAGHAT,BALAGHAT,Out-of-state,true
+BALAGHAT (M.P.),BALAGHAT,Out-of-state,true
+BALAGHAT (M. P.),BALAGHAT,Out-of-state,true
+BALAAGHAT (M.P),BALAGHAT,Out-of-state,true
+INDORE,INDORE,Out-of-state,true
+INDORE (M.P.),INDORE,Out-of-state,true
+INDORE (M.P),INDORE,Out-of-state,true
+JABALPUR,JABALPUR,Out-of-state,true
+JABALPUR (M.P.),JABALPUR,Out-of-state,true
+LABALPUR (M.P.),JABALPUR,Out-of-state,true
+SEONI,SEONI,Out-of-state,true
+CHHINDWARA,CHHINDWARA,Out-of-state,true
+CHHINDWARA (M.P.),CHHINDWARA,Out-of-state,true
+CHHINDWADA,CHHINDWARA,Out-of-state,true
+CHHINDWARA (M.P,CHHINDWARA,Out-of-state,true
+CHINDWARA,CHHINDWARA,Out-of-state,true
+CHINDWADA,CHHINDWARA,Out-of-state,true
+HOSHANGABAD (M.P.),HOSHANGABAD,Out-of-state,true
+HOSHANGABAD MP,HOSHANGABAD,Out-of-state,true
+SEHORE,SEHORE,Out-of-state,true
+UJJAIN,UJJAIN,Out-of-state,true
+UJJAIN (M.P.),UJJAIN,Out-of-state,true
+BURHANPUR,BURHANPUR,Out-of-state,true
+BURHANPUR (MP),BURHANPUR,Out-of-state,true
+PANDHURANA (MP),PANDHURANA,Out-of-state,true
+RAJNANDGAON (MP),RAJNANDGAON,Out-of-state,true
+DURG,DURG,Out-of-state,true
+DURG (CHHATISGARH),DURG,Out-of-state,true
+BHILAI,BHILAI,Out-of-state,true
+BHILAI (C.G.),BHILAI,Out-of-state,true
+BHILAI (CHATTISGARH),BHILAI,Out-of-state,true
+AHMEDABAD,AHMEDABAD,Out-of-state,true
+AHMEDABAD (GUJRAT),AHMEDABAD,Out-of-state,true
+AHMEDABAD (GUJARAT),AHMEDABAD,Out-of-state,true
+AHMADABAD,AHMEDABAD,Out-of-state,true
+AHEMADABAD,AHMEDABAD,Out-of-state,true
+AMEHEAD,AHMEDABAD,Out-of-state,true
+GANDHINAGAR (GUJRAT),GANDHINAGAR,Out-of-state,true
+GOA,GOA,Out-of-state,true
+GOA (STATE),GOA,Out-of-state,true
+PONDA (GOA),GOA,Out-of-state,true
+PANJI (GOA),GOA,Out-of-state,true
+PANJI,GOA,Out-of-state,true
+MARGAO (GOA),GOA,Out-of-state,true
