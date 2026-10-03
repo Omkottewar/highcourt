@@ -7,3 +7,12 @@ export function splitRespondents(raw) {
     .map(s => s.trim().replace(/\.+$/, '').trim())
     .filter(Boolean)
 }
+
+export function respondentNumbers(row) {
+  const names=splitRespondents(row.Respondets)
+  try { const numbers=JSON.parse(row.RespondentNumbers || '[]'); return names.map((_,i)=>String(numbers[i] || i+1)) }
+  catch { return names.map((_,i)=>String(i+1)) }
+}
+export function caseTitle(row) {
+  return row.Title || (row.Type ? String(row.Type).toUpperCase() : '')
+}

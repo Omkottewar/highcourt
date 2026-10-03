@@ -20,6 +20,7 @@ jspm_packages/
 
 # Build output
 dist/
+desktop-dist/
 build/
 out/
 
@@ -80,3 +81,11 @@ target/
 *.bak
 *.tmp
 *.temp
+
+# Local case databases and migration output
+data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+desktop-empty-dist/

@@ -1,31 +1,14 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import '@fontsource-variable/inter'
+import '@fontsource-variable/manrope'
 import CasesPage from './pages/Cases'
 import './index.css'
 
-function AppShell() {
-  return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div className="topbar-logo">
-          ⚖ Office of the Government Pleader
-          <span>High Court of Bombay · Bench at Nagpur</span>
-        </div>
-      </header>
-
-      <main className="main-content">
-        <Routes>
-          <Route path="/cases" element={<CasesPage />} />
-          <Route path="*" element={<Navigate to="/cases" replace />} />
-        </Routes>
-      </main>
-    </div>
-  )
-}
-
 export default function App() {
-  return (
-    <BrowserRouter>
-      <AppShell />
-    </BrowserRouter>
-  )
+  if (!window.desktop?.database) return <main style={{ maxWidth: 600, margin: '15vh auto', padding: 32 }}><h1>Open CourtDesk desktop</h1><p>Your case database is stored on this computer. Open the installed Windows application to manage your records.</p><p>For development, run <code>npm run desktop</code>.</p></main>
+  const Router = window.location.protocol === 'file:' ? HashRouter : BrowserRouter
+  return <Router><Routes>
+    <Route path="/cases" element={<CasesPage />} />
+    <Route path="*" element={<Navigate to="/cases" replace />} />
+  </Routes></Router>
 }

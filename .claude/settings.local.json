@@ -7,7 +7,8 @@
       "Bash(npm run *)",
       "Bash(curl -s -i 'https://gqnwysohazttukfncvig.supabase.co/rest/v1/district?select=id,name&limit=3' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxbnd5c29oYXp0dHVrZm5jdmlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzI2OTYsImV4cCI6MjA5NDM0ODY5Nn0.1YN1XgbXRujctYNCCocN-NxfF7zumS-TOTu76GpyCvU' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxbnd5c29oYXp0dHVrZm5jdmlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzI2OTYsImV4cCI6MjA5NDM0ODY5Nn0.1YN1XgbXRujctYNCCocN-NxfF7zumS-TOTu76GpyCvU')",
       "Bash(npm install *)",
-      "Bash(npm list *)"
+      "Bash(npm list *)",
+      "Bash(npx react-scripts *)"
     ]
   }
 }

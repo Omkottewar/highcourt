@@ -1,0 +1,515 @@
+{
+  "titles": [
+    "AA",
+    "CAP",
+    "RPA",
+    "ABA",
+    "CAPL",
+    "RPC",
+    "ACB",
+    "CAS",
+    "RPC.",
+    "ALP",
+    "CAT",
+    "RPF",
+    "ALS",
+    "CAW",
+    "RPL",
+    "AO",
+    "CAZ",
+    "RPN",
+    "APEAL",
+    "CEL",
+    "RPR",
+    "APL",
+    "CER",
+    "RPS",
+    "APPA",
+    "CMP",
+    "RPT",
+    "APPCO",
+    "COMAP",
+    "RPW",
+    "APPCP",
+    "CONF",
+    "SA",
+    "APPCR",
+    "CONP",
+    "SMAP",
+    "APPLB",
+    "CP",
+    "APPLN",
+    "CPL",
+    "SMC",
+    "APPP",
+    "CRA",
+    "SMCP",
+    "APPR",
+    "C.REF",
+    "SMP",
+    "APPW",
+    "CRPIL",
+    "SMPIL",
+    "ARA",
+    "CS",
+    "SMWP",
+    "ARP",
+    "EDR",
+    "BA",
+    "EP",
+    "CA",
+    "FA",
+    "SN",
+    "CAA",
+    "FCA",
+    "SPLCA",
+    "CAC",
+    "GTA",
+    "STA",
+    "CAE",
+    "GTR",
+    "STR",
+    "CAF",
+    "ITA",
+    "STXA",
+    "CAL",
+    "ITL",
+    "WP",
+    "CALCR",
+    "ITR",
+    "CAM",
+    "LPA",
+    "WTA",
+    "CAN",
+    "MCA",
+    "WTL",
+    "CAO",
+    "OLR",
+    "WTR",
+    "XOB"
+  ],
+  "types": [
+    {
+      "short_type": "AA",
+      "long_type": "Arbitration Appeals"
+    },
+    {
+      "short_type": "ABA",
+      "long_type": "Cr. Anticipatory Bail Applications"
+    },
+    {
+      "short_type": "ACB",
+      "long_type": "Application For Cancellation Of Bail"
+    },
+    {
+      "short_type": "ALP",
+      "long_type": "Appln. For Leave to Appeal By Pvt. Party"
+    },
+    {
+      "short_type": "ALS",
+      "long_type": "Appln. For Leave to Appeal By State"
+    },
+    {
+      "short_type": "AO",
+      "long_type": "Appeal from Order"
+    },
+    {
+      "short_type": "APEAL",
+      "long_type": "Criminal Appeal"
+    },
+    {
+      "short_type": "APL",
+      "long_type": "Cr. Application U/s 482"
+    },
+    {
+      "short_type": "APPA",
+      "long_type": "Cr. Application in Appeal"
+    },
+    {
+      "short_type": "APPCO",
+      "long_type": "Application in Cr. Conf."
+    },
+    {
+      "short_type": "APPCP",
+      "long_type": "Application in Cr. Cont. Petn."
+    },
+    {
+      "short_type": "APPCR",
+      "long_type": "Application in Cr. Reference"
+    },
+    {
+      "short_type": "APPLB",
+      "long_type": "Criminal Appln. of Bail"
+    },
+    {
+      "short_type": "APPLN",
+      "long_type": "Criminal Application"
+    },
+    {
+      "short_type": "APPP",
+      "long_type": "Cr. Application in Application"
+    },
+    {
+      "short_type": "APPR",
+      "long_type": "Cr. Application in Revision"
+    },
+    {
+      "short_type": "APPW",
+      "long_type": "Cr.Application in Writ Petition"
+    },
+    {
+      "short_type": "ARA",
+      "long_type": "Arbitration application"
+    },
+    {
+      "short_type": "ARP",
+      "long_type": "Arbitration Petition"
+    },
+    {
+      "short_type": "BA",
+      "long_type": "Cr. Bail Applications"
+    },
+    {
+      "short_type": "CA",
+      "long_type": "Civil Application"
+    },
+    {
+      "short_type": "CAA",
+      "long_type": "Civil Application in AO"
+    },
+    {
+      "short_type": "CAC",
+      "long_type": "Civil Application in CRA"
+    },
+    {
+      "short_type": "CAE",
+      "long_type": "Civil Application in Civil Reference"
+    },
+    {
+      "short_type": "CAF",
+      "long_type": "Civil Application in FA"
+    },
+    {
+      "short_type": "CAL",
+      "long_type": "Company Application"
+    },
+    {
+      "short_type": "CALCR",
+      "long_type": "Company Applications (Criminal)"
+    },
+    {
+      "short_type": "CAM",
+      "long_type": "Civil Application in AA"
+    },
+    {
+      "short_type": "CAN",
+      "long_type": "Civil Application in CP"
+    },
+    {
+      "short_type": "CAO",
+      "long_type": "CA IN OTHERS (MCA/EP/CA/XOB/CMP)"
+    },
+    {
+      "short_type": "CAP",
+      "long_type": "Company Appeal"
+    },
+    {
+      "short_type": "CAPL",
+      "long_type": "CUSTOM APPEAL"
+    },
+    {
+      "short_type": "CAS",
+      "long_type": "Civil Application in SA"
+    },
+    {
+      "short_type": "CAT",
+      "long_type": "Civil Application in Tax Matters"
+    },
+    {
+      "short_type": "CAW",
+      "long_type": "Civil Application in WP"
+    },
+    {
+      "short_type": "CAZ",
+      "long_type": "Civil Application in LPA"
+    },
+    {
+      "short_type": "CEL",
+      "long_type": "CENTRAL EXCISE APPEAL"
+    },
+    {
+      "short_type": "CER",
+      "long_type": "Central Excise Reference"
+    },
+    {
+      "short_type": "CMP",
+      "long_type": "Company Petition"
+    },
+    {
+      "short_type": "COMAP",
+      "long_type": "Commercial Appeal"
+    },
+    {
+      "short_type": "CONF",
+      "long_type": "Criminal Confirmation Case"
+    },
+    {
+      "short_type": "CONP",
+      "long_type": "Criminal Contempt Petition"
+    },
+    {
+      "short_type": "CP",
+      "long_type": "Cont. Petition"
+    },
+    {
+      "short_type": "CPL",
+      "long_type": "Contempt Appeal"
+    },
+    {
+      "short_type": "CRA",
+      "long_type": "Civil Revision Application"
+    },
+    {
+      "short_type": "C.REF",
+      "long_type": "Civil References"
+    },
+    {
+      "short_type": "CRPIL",
+      "long_type": "Cr. Public Interest Litigation"
+    },
+    {
+      "short_type": "CS",
+      "long_type": "Civil Suits (Transfer Civil Suit)"
+    },
+    {
+      "short_type": "EDR",
+      "long_type": "Estate Duty Reference"
+    },
+    {
+      "short_type": "EP",
+      "long_type": "Election petition"
+    },
+    {
+      "short_type": "FA",
+      "long_type": "First Appeal"
+    },
+    {
+      "short_type": "FCA",
+      "long_type": "Family Court Appeal"
+    },
+    {
+      "short_type": "GTA",
+      "long_type": "Gift Tax application"
+    },
+    {
+      "short_type": "GTR",
+      "long_type": "Gift Tax Reference"
+    },
+    {
+      "short_type": "ITA",
+      "long_type": "Income tax application"
+    },
+    {
+      "short_type": "ITL",
+      "long_type": "INCOME TAX APPEAL"
+    },
+    {
+      "short_type": "ITR",
+      "long_type": "Income tax reference"
+    },
+    {
+      "short_type": "LPA",
+      "long_type": "Letter Patent Appeal"
+    },
+    {
+      "short_type": "MCA",
+      "long_type": "Misc.Civil Application"
+    },
+    {
+      "short_type": "OLR",
+      "long_type": "Official Liquidator Report"
+    },
+    {
+      "short_type": "PIL",
+      "long_type": "Public Interest Litigation"
+    },
+    {
+      "short_type": "RAP",
+      "long_type": "Review Petn. in ARA"
+    },
+    {
+      "short_type": "RC",
+      "long_type": "Rejected Case"
+    },
+    {
+      "short_type": "REF",
+      "long_type": "Criminal Reference"
+    },
+    {
+      "short_type": "REVN",
+      "long_type": "Criminal Revision Application"
+    },
+    {
+      "short_type": "RPA",
+      "long_type": "Review Petn. in AO"
+    },
+    {
+      "short_type": "RPC",
+      "long_type": "Review Petn. in CRA"
+    },
+    {
+      "short_type": "RPC.",
+      "long_type": "Review Petn. in FCA"
+    },
+    {
+      "short_type": "RPF",
+      "long_type": "Review Petn. in FA"
+    },
+    {
+      "short_type": "RPL",
+      "long_type": "Review petn. in LPA"
+    },
+    {
+      "short_type": "RPN",
+      "long_type": "Review Petn. in CP"
+    },
+    {
+      "short_type": "RPR",
+      "long_type": "Review Petn. in ARP"
+    },
+    {
+      "short_type": "RPS",
+      "long_type": "Review Petn. in SA"
+    },
+    {
+      "short_type": "RPT",
+      "long_type": "Review Petn. in CAPL"
+    },
+    {
+      "short_type": "RPW",
+      "long_type": "Review petn.in WP"
+    },
+    {
+      "short_type": "SA",
+      "long_type": "Second Appeal"
+    },
+    {
+      "short_type": "SMAP",
+      "long_type": "Cr. Suo Motu Application"
+    },
+    {
+      "short_type": "SMAP",
+      "long_type": "Suo Motu Application"
+    },
+    {
+      "short_type": "SMC",
+      "long_type": "Suo Motu Contempt Petition"
+    },
+    {
+      "short_type": "SMCP",
+      "long_type": "Cr. Suo Motu Contempt Petition"
+    },
+    {
+      "short_type": "SMP",
+      "long_type": "Suo Motu Cr PIL"
+    },
+    {
+      "short_type": "SMPIL",
+      "long_type": "Suo Motu PIL"
+    },
+    {
+      "short_type": "SMWP",
+      "long_type": "Suo Motu Cr. Writ Petition"
+    },
+    {
+      "short_type": "SMWP",
+      "long_type": "Suo Motu Writ Petition"
+    },
+    {
+      "short_type": "SMWP",
+      "long_type": "SM - W.P."
+    },
+    {
+      "short_type": "SN",
+      "long_type": "Stamp Number (Crim)"
+    },
+    {
+      "short_type": "SPLCA",
+      "long_type": "Special Civil Application"
+    },
+    {
+      "short_type": "STA",
+      "long_type": "SALES TAX APPLICATION"
+    },
+    {
+      "short_type": "STR",
+      "long_type": "SALES TAX REFERENCE"
+    },
+    {
+      "short_type": "STXA",
+      "long_type": "Sales Tax Appeal"
+    },
+    {
+      "short_type": "WP",
+      "long_type": "Writ Petition"
+    },
+    {
+      "short_type": "WP",
+      "long_type": "Criminal Writ Petition"
+    },
+    {
+      "short_type": "WTA",
+      "long_type": "Wealth Tax application"
+    },
+    {
+      "short_type": "WTL",
+      "long_type": "Wealth Tax Appeal"
+    },
+    {
+      "short_type": "WTR",
+      "long_type": "Wealth Tax reference"
+    },
+    {
+      "short_type": "XOB",
+      "long_type": "Cross Objection"
+    }
+  ],
+  "districts": [
+    "Ahilyanagar",
+    "Hingoli",
+    "Palghar",
+    "Akola",
+    "Jalgaon",
+    "Parbhani",
+    "Amravati",
+    "Jalna",
+    "Pune",
+    "Beed",
+    "Kolhapur",
+    "Raigad",
+    "Bhandara",
+    "Latur",
+    "Ratnagiri",
+    "Buldhana",
+    "Mumbai City",
+    "Sangli",
+    "Chandrapur",
+    "Mumbai Suburban",
+    "Satara",
+    "Chhatrapati Sambhajinagar",
+    "Nagpur",
+    "Sindhudurg",
+    "Dharashiv",
+    "Nanded",
+    "Solapur",
+    "Dhule",
+    "Nandurbar",
+    "Thane",
+    "Gadchiroli",
+    "Nashik",
+    "Wardha",
+    "Gondia",
+    "Washim",
+    "Yavatmal"
+  ]
+}

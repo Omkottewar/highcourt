@@ -1,19 +1,18 @@
 {
   "name": "highcourt-gp-nagpur",
-  "version": "1.0.0",
+  "version": "2.0.2",
   "private": true,
-  "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
-    "date-fns": "^3.3.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.22.0",
-    "react-scripts": "5.0.1",
-    "xlsx": "^0.18.5"
-  },
+  "main": "desktop/main.cjs",
+  "homepage": ".",
+  "description": "High Court case management desktop application",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "test": "react-scripts test --watchAll=false --runInBand",
+    "desktop": "npm run build && electron .",
+    "desktop:pack": "npm run build && electron-builder --win --dir",
+    "desktop:dist": "npm run build && electron-builder --win nsis",
+    "test:database": "node desktop/database.test.cjs"
   },
   "browserslist": {
     "production": [
@@ -23,5 +22,56 @@
     "development": [
       "last 1 chrome version"
     ]
+  },
+  "build": {
+    "appId": "com.highcourt.casemanagement",
+    "productName": "High Court Case Management",
+    "extends": null,
+    "directories": {
+      "output": "desktop-dist"
+    },
+    "files": [
+      "build/**/*",
+      "desktop/**/*",
+      "package.json",
+      "!node_modules/**/*",
+      "!desktop/**/*.test.cjs"
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "extraResources": [
+      {
+        "from": "data/initial-register.sqlite",
+        "to": "initial-register.sqlite"
+      },
+      {
+        "from": "data/migration-review.csv",
+        "to": "migration-review.csv"
+      },
+      {
+        "from": "data/advocates.json",
+        "to": "advocates.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "date-fns": "^3.3.1",
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "lucide-react": "^1.48.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "react-scripts": "5.0.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }

@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { Modal, CaseBadge } from './UI'
 import { format } from 'date-fns'
 import { printCase } from '../utils/printCase'
-import { splitRespondents } from '../utils/respondents'
+import { splitRespondents, respondentNumbers } from '../utils/respondents'
+import { getCasePdf } from '../lib/database'
+import { Printer, Trash2 } from 'lucide-react'
 
 function Section({ title, children }) {
   return (
@@ -17,11 +19,16 @@ function fmtDate(dateStr) {
   if (!dateStr || dateStr === '1900-01-01') return 'Date Unknown'
   try { return format(new Date(dateStr), 'dd MMMM yyyy') } catch { return '—' }
 }
+function fmtDateTime(value) {
+  if (!value) return null
+  try { return format(new Date(value), 'dd MMM yyyy, HH:mm') } catch { return null }
+}
 
-export default function CaseDetail({ open, onClose, caseData }) {
+export default function CaseDetail({ open, onClose, caseData, onDelete }) {
+  const [pdfError,setPdfError] = useState('')
   const [tab, setTab] = useState('details')
 
-  useEffect(() => { if (open) setTab('details') }, [open])
+  useEffect(() => { if (open) {setTab('details');setPdfError('')} }, [open])
 
   if (!caseData) return null
 
@@ -31,16 +38,34 @@ export default function CaseDetail({ open, onClose, caseData }) {
     <Modal open={open} onClose={onClose} size="820px"
       title={`Case ${caseData.RegdNo}`}
       footer={
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+          {onDelete && (
+            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--red)', marginRight: 'auto' }}
+              onClick={() => onDelete(caseData)}
+              title="Delete this case">
+              <Trash2 size={15} /> Delete case
+            </button>
+          )}
           <button className="btn btn-ghost btn-sm"
             onClick={() => printCase(caseData)}
-            title="Print case document">
-            ⎙ Print
+            title="Print or save the case record as PDF">
+            <Printer size={15} /> Print / Save PDF
           </button>
           <button className="btn btn-ghost" onClick={onClose}>Close</button>
         </div>
       }>
 
+      {pdfError && <p role="alert">{pdfError}</p>}
+      <div style={{marginBottom:16}}>
+        <strong>Case PDF: </strong>{caseData.PdfName || 'No PDF attached'}
+        {caseData.PdfName && <button className="btn btn-ghost" onClick={async()=>{
+          const {data,error}=await getCasePdf({id:caseData.id})
+          if(error || !data){setPdfError(error?.message || 'PDF not found');return}
+          const url=URL.createObjectURL(new Blob([data.bytes],{type:'application/pdf'}))
+          const link=document.createElement('a');link.href=url;link.download=data.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),60000)
+        }}>Download PDF</button>}
+        <p className="form-hint">Use Edit Case to upload or replace this PDF.</p>
+      </div>
       {/* Case header strip */}
       <div style={{ background: 'var(--navy)', borderRadius: 8, padding: '14px 18px', marginBottom: 20, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
         <CaseBadge type={caseData.Type} />
@@ -90,6 +115,22 @@ export default function CaseDetail({ open, onClose, caseData }) {
                 <div className="detail-field-label">Copy received for Resp. No.</div>
                 <div className="detail-field-value mono">{caseData.RespndentNo || '—'}</div>
               </div>
+              <div className="detail-field">
+                <div className="detail-field-label">Case number (court-assigned)</div>
+                <div className="detail-field-value mono">{caseData.CaseNumber ? `${caseData.CaseNumber}${caseData.CYear ? '/' + caseData.CYear : ''}` : '—'}</div>
+              </div>
+              {caseData.CreatedAt && (
+                <div className="detail-field">
+                  <div className="detail-field-label">File created at</div>
+                  <div className="detail-field-value">{fmtDateTime(caseData.CreatedAt) || caseData.CreatedAt}</div>
+                </div>
+              )}
+              {caseData.UpdatedAt && (
+                <div className="detail-field">
+                  <div className="detail-field-label">File updated at</div>
+                  <div className="detail-field-value">{fmtDateTime(caseData.UpdatedAt) || caseData.UpdatedAt}</div>
+                </div>
+              )}
               {caseData.LongType && (
                 <div className="detail-field" style={{ gridColumn: '1 / -1' }}>
                   <div className="detail-field-label">Long type</div>
@@ -114,12 +155,6 @@ export default function CaseDetail({ open, onClose, caseData }) {
                 <div className="detail-field-label">Mobile</div>
                 <div className="detail-field-value mono">{caseData.AdvMoNo || '—'}</div>
               </div>
-              {caseData.AdvAddress && (
-                <div className="detail-field" style={{ gridColumn: '1 / -1' }}>
-                  <div className="detail-field-label">Address</div>
-                  <div className="detail-field-value">{caseData.AdvAddress}</div>
-                </div>
-              )}
             </div>
           </Section>
         </div>
@@ -136,7 +171,7 @@ export default function CaseDetail({ open, onClose, caseData }) {
             <div className="resp-list">
               {respondents.map((name, i) => (
                 <div key={i} className="resp-item">
-                  <div className="resp-no">{i + 1}</div>
+                  <div className="resp-no">{respondentNumbers(caseData)[i].padStart(2, '0')}</div>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 500 }}>{name}</div>
                   </div>
