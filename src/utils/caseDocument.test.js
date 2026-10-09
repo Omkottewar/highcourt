@@ -10,7 +10,7 @@ const options = { generatedAt: '2026-09-26T12:00:00Z' }
 
 test('the professional case record includes every recorded case field', () => {
   const html = buildCaseDocument(sample, options)
-  for (const value of ['12345', 'SAMPLE PETITIONER', 'FIRST RESPONDENT', 'SECOND RESPONDENT', 'WRIT PETITION',
+  for (const value of ['12345', 'SAMPLE PETITIONER', 'FIRST RESPONDENT', 'SECOND RESPONDENT',
     'NAGPUR', '03 April 2025', 'SAMPLE ADVOCATE', '0123456789', '1, 2', 'First line\nSecond line']) expect(html).toContain(value)
   expect(html).toContain('<b>WP</b>')
   expect(html).toContain('CASE REFERENCE')
@@ -19,8 +19,9 @@ test('the professional case record includes every recorded case field', () => {
   expect(html).toContain('Office of the Government Pleader')
   expect(html).toContain('Bench at Nagpur')
   expect(html).toContain('Case record')
-  expect(html).toContain('PARTIES TO THE CASE')
-  expect(html).toContain('ADVOCATE DETAILS')
+  expect(html).toContain('PETITIONER')
+  expect(html).toContain('RESPONDENT(S)')
+  expect(html).toContain('ADVOCATE ON RECORD')
   expect(html).toContain('REMARKS')
   expect(html).toContain('Generated 26 Sep 2026')
 })
@@ -28,7 +29,7 @@ test('the professional case record includes every recorded case field', () => {
 test('court-assigned case number is composed into the printed line with case year', () => {
   const html = buildCaseDocument({ ...sample, CaseNumber: '7373' }, options)
   expect(html).toContain('7373/2025')
-  expect(html).not.toContain('______/20_____')
+  expect(html).not.toContain('______/20____')
 })
 
 test('missing dates and respondents are safely handled', () => {
@@ -48,7 +49,7 @@ test('case text cannot inject markup, scripts, or style tags into a print window
 
 test('long respondent lists are retained and the print flow waits for fonts', () => {
   const html = buildCaseDocument({ ...sample, Respondets: Array.from({ length: 40 }, (_, i) => `Respondent ${i + 1}`).join('.,') }, { ...options, autoPrint: true })
-  expect(html.match(/class="resp-name"/g)).toHaveLength(40)
+  expect(html.match(/class="resp-item"/g)).toHaveLength(40)
   expect(html).toContain('await document.fonts.ready')
   expect(html.indexOf('window.onafterprint')).toBeLessThan(html.indexOf('window.print()'))
 })
@@ -57,6 +58,6 @@ test('title controls the blank line and respondent numbers come from the stored 
   const html = buildCaseDocument({ ...sample, Title: 'ACB', RespondentNumbers: '["3","7"]' }, options)
   expect(html).toContain('<b>ACB</b>')
   expect(html).not.toContain('<b>WP</b>')
-  expect(html).toContain('class="resp-no">03</div>')
-  expect(html).toContain('class="resp-no">07</div>')
+  expect(html).toContain('class="resp-num">03.</span>')
+  expect(html).toContain('class="resp-num">07.</span>')
 })

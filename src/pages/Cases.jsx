@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { HardDrive, Download, Upload, Plus, Search, SlidersHorizontal, ArrowUpDown,
   Columns3, RefreshCw, ChevronDown, ArrowUp, ArrowDown, X, Printer, Pencil,
-  CheckCheck, FolderOpen, CircleHelp, Check } from 'lucide-react'
+  CheckCheck, FolderOpen, CircleHelp, Check, LogOut, Users as UsersIcon, History } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { searchCases, getDistrictOptions, getCaseTypeOptions, deleteCase, getDatabaseInfo, backupDatabase, restoreDatabase } from '../lib/database'
-import { Spinner, CaseBadge, EmptyState, Pagination, Confirm, FilterSelect, Modal } from '../components/UI'
+import { Spinner, CaseBadge, EmptyState, Pagination, FilterSelect, Modal } from '../components/UI'
 import CaseForm from '../components/CaseForm'
 import CaseDetail from '../components/CaseDetail'
+import ClerkEditDialog from '../components/ClerkEditDialog'
+import DeletePasswordConfirm from '../components/DeletePasswordConfirm'
 import ExportDialog from '../components/ExportDialog'
 import ImportDialog from '../components/ImportDialog'
 import { printCase } from '../utils/printCase'
@@ -22,7 +25,10 @@ const displayDate = value => {
 }
 const number = value => value.toLocaleString('en-IN')
 
-export default function CasesPage() {
+export default function CasesPage({ user, onSignOut }) {
+  const navigate = useNavigate()
+  const isClerk = user?.role === 'clerk'
+  const isAdmin = !user || user.role === 'admin'
   const [filters, setFilters] = useState({ ...EMPTY_FILTERS })
   const [cases, setCases] = useState([])
   const [total, setTotal] = useState(0)
@@ -41,6 +47,7 @@ export default function CasesPage() {
   const [selected, setSelected] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editCase, setEditCase] = useState(null)
+  const [clerkEditCase, setClerkEditCase] = useState(null)
   const [detailCase, setDetailCase] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [dialog, setDialog] = useState('')
@@ -183,8 +190,16 @@ export default function CasesPage() {
 
   return <div className="app-shell">
       <main className="main-content">
-        <div className="page-header"><div><h1 className="page-title">Office of the Government Pleader, High Court of Bombay, Bench at Nagpur.<span className="title-dot">.</span></h1></div>
-          <div className="header-actions"><button className="btn btn-ghost" onClick={() => setDialog('export')} disabled={busy || loading}><Download size={16} />Export</button><button className="btn btn-ghost" disabled={busy} title="Import Excel or CSV" onClick={() => setDialog('import')}><Upload size={16} />Import</button><button className="btn btn-primary" disabled={busy} title="Create a case" onClick={() => { setEditCase(null); setShowForm(true) }}><Plus size={17} />New case</button></div>
+        <div className="page-header"><div><h1 className="page-title">Office of the Government Pleader, High Court of Bombay, Bench at Nagpur<span className="title-dot">.</span></h1></div>
+          <div className="header-actions">
+            {user && <span className="user-pill" title={`Signed in as ${user.username} (${user.role})`}>{user.username} · {user.role}</span>}
+            {isAdmin && <button className="btn btn-ghost" title="Users" onClick={() => navigate('/users')}><UsersIcon size={16} />Users</button>}
+            {isAdmin && <button className="btn btn-ghost" title="Edit log" onClick={() => navigate('/edit-log')}><History size={16} />Edit log</button>}
+            <button className="btn btn-ghost" onClick={() => setDialog('export')} disabled={busy || loading}><Download size={16} />Export</button>
+            {isAdmin && <button className="btn btn-ghost" disabled={busy} title="Import Excel or CSV" onClick={() => setDialog('import')}><Upload size={16} />Import</button>}
+            {isAdmin && <button className="btn btn-primary" disabled={busy} title="Create a case" onClick={() => { setEditCase(null); setShowForm(true) }}><Plus size={17} />New case</button>}
+            {onSignOut && <button className="btn btn-ghost" title="Sign out" onClick={onSignOut}><LogOut size={16} />Sign out</button>}
+          </div>
         </div>
         {error && <div className="alert alert-error" role="alert"><CircleHelp size={17} /><span>{error}</span><button aria-label="Dismiss error" className="icon-button" onClick={() => setError('')}><X size={16} /></button></div>}
         {notice && <div className="toast" role="status"><Check size={17} />{notice}<button aria-label="Dismiss notification" className="icon-button" onClick={() => setNotice('')}><X size={15} /></button></div>}
@@ -208,7 +223,7 @@ export default function CasesPage() {
             {loading ? <div className="loading-row"><Spinner /><span>Loading case records…</span></div> : !cases.length ? <EmptyState icon={<FolderOpen size={36} />} text={error ? 'Records could not be loaded' : 'No cases match your search'} /> : <table className="resizable-table">
               <colgroup><col style={{ width: 32 }} />{visibleFields.map(field => <col key={field.key} style={{ width: columnWidths[field.key] || 140 }} />)}<col style={{ width: 90 }} /></colgroup>
               <thead><tr><th className="checkbox-cell"><input aria-label="Select all records on this page" type="checkbox" checked={selected.length === cases.length} ref={el => { if (el) el.indeterminate = selected.length > 0 && selected.length < cases.length }} onChange={e => setSelected(e.target.checked ? cases.map((_, index) => index) : [])} /></th>{visibleFields.map(field => <th key={field.key} aria-sort={filters.sortField === field.key ? filters.sortAsc ? 'ascending' : 'descending' : 'none'}><button onClick={() => sortBy(field.key)}>{field.label}{filters.sortField === field.key ? filters.sortAsc ? <ArrowUp size={13} /> : <ArrowDown size={13} /> : <ArrowUpDown size={12} className="sort-idle" />}</button><span className="col-resize-handle" onMouseDown={e => startResize(field.key, e)} onClick={e => e.stopPropagation()} role="separator" aria-label={`Resize ${field.label}`} /></th>)}<th className="actions-heading">Actions</th></tr></thead>
-              <tbody>{cases.map((row, index) => <tr key={`${row.RegdNo}-${row.CYear}-${index}`} className={selected.includes(index) ? 'selected-row' : ''} tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' && e.target === e.currentTarget) setDetailCase(row) }} onClick={() => setDetailCase(row)}><td className="checkbox-cell" onClick={e => e.stopPropagation()}><input aria-label={`Select case ${row.RegdNo}`} type="checkbox" checked={selected.includes(index)} onChange={e => setSelected(current => e.target.checked ? [...current, index] : current.filter(i => i !== index))} /></td>{visibleFields.map(field => <td key={field.key} title={String(row[field.key] ?? '')}>{field.key === 'RegdNo' ? <button className="record-link" onClick={() => setDetailCase(row)} aria-label={`View case ${row.RegdNo}`}>{cell(row, field.key)}</button> : cell(row, field.key)}</td>)}<td className="row-actions" onClick={e => e.stopPropagation()}><button className="icon-button" title="Print" aria-label={`Print case ${row.RegdNo}`} onClick={() => printCase(row)}><Printer size={15} /></button><button className="icon-button" title="Edit case" aria-label={`Edit case ${row.RegdNo}`} disabled={busy} onClick={() => { setEditCase(row); setShowForm(true) }}><Pencil size={15} /></button></td></tr>)}</tbody>
+              <tbody>{cases.map((row, index) => <tr key={`${row.RegdNo}-${row.CYear}-${index}`} className={selected.includes(index) ? 'selected-row' : ''} tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' && e.target === e.currentTarget) setDetailCase(row) }} onClick={() => setDetailCase(row)}><td className="checkbox-cell" onClick={e => e.stopPropagation()}><input aria-label={`Select case ${row.RegdNo}`} type="checkbox" checked={selected.includes(index)} onChange={e => setSelected(current => e.target.checked ? [...current, index] : current.filter(i => i !== index))} /></td>{visibleFields.map(field => <td key={field.key} title={String(row[field.key] ?? '')}>{field.key === 'RegdNo' ? <button className="record-link" onClick={() => setDetailCase(row)} aria-label={`View case ${row.RegdNo}`}>{cell(row, field.key)}</button> : cell(row, field.key)}</td>)}<td className="row-actions" onClick={e => e.stopPropagation()}><button className="icon-button" title="Print" aria-label={`Print case ${row.RegdNo}`} onClick={() => printCase(row)}><Printer size={15} /></button><button className="icon-button" title={isClerk ? `Update case number for ${row.RegdNo}` : `Edit case ${row.RegdNo}`} aria-label={`Edit case ${row.RegdNo}`} disabled={busy} onClick={() => isClerk ? setClerkEditCase(row) : (setEditCase(row), setShowForm(true))}><Pencil size={15} /></button></td></tr>)}</tbody>
             </table>}
           </div>
           <div className="table-footer"><span>{total ? `${number(page * pageSize + 1)}–${number(Math.min((page + 1) * pageSize, total))}` : '0'} of <strong>{number(total)}</strong> records</span><label className="page-size">Rows per page<select aria-label="Rows per page" value={pageSize} onChange={e => setPageSize(Number(e.target.value))}>{[25, 50, 100, 250].map(value => <option key={value}>{value}</option>)}</select></label><Pagination page={page} total={total} pageSize={pageSize} onChange={pg => load(pg)} disabled={loading} /></div>
@@ -221,7 +236,8 @@ export default function CasesPage() {
     <Modal open={dialog === 'database'} onClose={databaseBusy ? () => {} : () => setDialog('')} title="Backup & restore" size="560px"><p className="dialog-intro">Keep a backup on another drive to protect your records. Restore replaces the register after confirmation and saves a safety copy first.</p><p className="form-hint" style={{ overflowWrap: 'anywhere' }}>Database: {databaseInfo?.path}</p><div className="library-actions"><button className="btn btn-primary" disabled={busy} onClick={() => handleDatabase('backup')}><Download size={16} />Back up database</button><button className="btn btn-ghost" disabled={busy} onClick={() => handleDatabase('restore')}><Upload size={16} />Restore backup</button></div>{databaseBusy && <Spinner />}</Modal>
     <Modal open={dialog === 'help'} onClose={() => setDialog('')} title="Workspace guide" size="520px"><div className="guide-list">{[[Search, 'Find the right case', 'Use Ctrl + K to search, choose a field, then open Filters to narrow by district, type, year or filing dates.'], [Download, 'Export records', 'Select records on a page, or export all matching results. Choose Excel or CSV and the columns you need.'], [HardDrive, 'Work without a connection', 'All records are stored on this computer. Back up the database to another drive from the Backup menu.']].map(([Icon, title, text]) => <div key={title}><Icon size={22} /><section><strong>{title}</strong><p>{text}</p></section></div>)}</div></Modal>
     <CaseForm open={showForm} onClose={() => setShowForm(false)} editCase={editCase} onSaved={() => { load(page); getDatabaseInfo().then(setDatabaseInfo); setNotice(editCase ? 'Case updated.' : 'Case created.') }} />
-    <CaseDetail open={!!detailCase} onClose={() => setDetailCase(null)} caseData={detailCase} onDelete={row => { setDetailCase(null); setDeleteTarget(row) }} />
-    <Confirm open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete this case?" danger message={<span>Case <strong>#{deleteTarget?.RegdNo}</strong> will be permanently removed from the local register. This cannot be undone.</span>} />
+    <ClerkEditDialog open={!!clerkEditCase} onClose={() => setClerkEditCase(null)} caseData={clerkEditCase} onSaved={() => { load(page); setNotice('Case number updated.') }} />
+    <CaseDetail open={!!detailCase} onClose={() => setDetailCase(null)} caseData={detailCase} onDelete={isAdmin ? row => { setDetailCase(null); setDeleteTarget(row) } : null} />
+    <DeletePasswordConfirm open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete} caseData={deleteTarget} />
   </div>
 }
